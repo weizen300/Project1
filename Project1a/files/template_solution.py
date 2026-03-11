@@ -1,6 +1,8 @@
 # This serves as a template which will guide you through the implementation of this task. It is advised
 # to first read the whole template and get a sense of the overall structure of the code before trying to fill in any of the TODO gaps.
 # First, we import necessary libraries:
+from random import shuffle
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold
@@ -9,7 +11,7 @@ from sklearn.model_selection import KFold
 # any additional imports)
 # import ...
 
-def fit(X, y, lam):
+def fit(X, y, lam) -> np.ndarray:
     """
     This function receives training data points, then fits the ridge regression on this data
     with regularization hyperparameter lambda. The weights w of the fitted ridge regression
@@ -25,8 +27,8 @@ def fit(X, y, lam):
     ----------
     w: array of floats: dim = (13,), optimal parameters of ridge regression
     """
-    weights = np.zeros((13,))
     # TODO: Enter your code here
+    weights = np.linalg.solve(X.T @ X + lam * np.eye(13), X.T @ y)
     assert weights.shape == (13,)
     return weights
 
@@ -45,7 +47,9 @@ def calculate_RMSE(w, X, y):
     ----------
     rmse: float: dim = 1, RMSE value
     """
-    rmse = 0
+    n = 15
+    y_hat = X @ w
+    rmse = np.sqrt(1./n * np.sum((y - y_hat)**2))
     # TODO: Enter your code here
     assert np.isscalar(rmse)
     return rmse
@@ -71,8 +75,22 @@ def average_LR_RMSE(X, y, lambdas, n_folds):
 
     # TODO: Enter your code here. Hint: Use functions 'fit' and 'calculate_RMSE' with training and test data
     # and fill all entries in the matrix 'RMSE_mat'
+    kf = KFold(n_splits=n_folds, shuffle=True, random_state=42)
+    for i, (train_index, test_index) in enumerate(kf.split(X)):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+        for j, lamb in enumerate(lambdas):
+            # a) Calculate the weights
+            weights = fit(X_train, y_train, lamb)
+            # b) Calculate the Root Mean Squared Error
+            rmse = calculate_RMSE(weights, X_test, y_test)
+            # c) Put the error in the matrix
+            RMSE_mat[i, j] = rmse
+
 
     avg_RMSE = np.mean(RMSE_mat, axis=0)
+    print(f"avg_RMSE ={avg_RMSE}")
     assert avg_RMSE.shape == (5,)
     return avg_RMSE
 
