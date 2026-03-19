@@ -38,7 +38,7 @@ def fit(X, y, lam) -> np.ndarray:
     # 2. Augment the y vector with zeros
     y_augmented = np.concatenate([y, np.zeros(n_features)])
 
-    # 3. Solve using np.linalg.lstsq (which uses highly stable SVD)
+    # 3. Solve using np.linalg.lstsq
     weights, *_= np.linalg.lstsq(X_augmented, y_augmented)
     assert weights.shape == (13,)
     return weights
