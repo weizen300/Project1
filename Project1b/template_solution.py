@@ -77,7 +77,7 @@ def fit_logistic_regression(X, y, lam=0.):
         # Regularization part (don't penalize bias)
         w_reg = weights.copy()
         w_reg[-1] = 0
-            gradient = (1. / n_samples) * (X_transformed.T @ (h - y)) + 2 * lam * w_reg
+        gradient = (1. / n_samples) * (X_transformed.T @ (h - y)) + 2 * lam * w_reg
 
         # 2. Update biased first moment estimate
         m = beta1 * m + (1 - beta1) * gradient
